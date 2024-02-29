@@ -14,6 +14,10 @@ import React from "react";
      };
 
      // Stryker disable all : hard to test for query caching
+     // Issue #24
+     const staffPageCallback = (cell) => {
+        navigate(`/courses/${cell.row.values.id}/staff`);
+     };
 
      const deleteMutation = useBackendMutation(
          cellToAxiosParamsDelete,
@@ -59,6 +63,8 @@ import React from "react";
      if (hasRole(currentUser, "ROLE_ADMIN") || hasRole(currentUser, "ROLE_INSTRUCTOR")) {
          columns.push(ButtonColumn("Edit", "primary", editCallback, "CoursesTable"));
          columns.push(ButtonColumn("Delete", "danger", deleteCallback, "CoursesTable"));
+         // Add Staff button if user has appropriate role
+        columns.push(ButtonColumn("Staff", "secondary", staffPageCallback, "CoursesTable"));
      }
 
      return <OurTable
