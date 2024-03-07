@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { MemoryRouter } from "react-router-dom";
 import { currentUserFixtures } from "fixtures/currentUserFixtures";
 
-
 const mockedNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
@@ -52,6 +51,8 @@ describe("UserTable tests", () => {
     const deleteButton = screen.queryByTestId(`${testId}-cell-row-0-col-Delete-button`);
     expect(deleteButton).not.toBeInTheDocument();
 
+    const deletedCoursesElement = screen.getByText("Deleted Courses: 0"); // Assuming there are 0 deleted courses
+    expect(deletedCoursesElement).toBeInTheDocument();
   });
 
   test("renders empty table correctly", () => {
@@ -82,6 +83,9 @@ describe("UserTable tests", () => {
       const fieldElement = screen.queryByTestId(`${testId}-cell-row-0-col-${field}`);
       expect(fieldElement).not.toBeInTheDocument();
     });
+
+    const deletedCoursesElement = screen.getByText("Deleted Courses: 0"); // Assuming there are 0 deleted courses
+    expect(deletedCoursesElement).toBeInTheDocument();
   });
 
 
@@ -123,6 +127,8 @@ describe("UserTable tests", () => {
     expect(deleteButton).toBeInTheDocument();
     expect(deleteButton).toHaveClass("btn-danger");
 
+    const deletedCoursesElement = screen.getByText("Deleted Courses: 0"); // Assuming there are 0 deleted courses
+    expect(deletedCoursesElement).toBeInTheDocument();
   });
 
   test("Edit button navigates to the edit page for admin user", async () => {
@@ -147,6 +153,8 @@ describe("UserTable tests", () => {
 
     await waitFor(() => expect(mockedNavigate).toHaveBeenCalledWith('/courses/edit/1'));
 
+    const deletedCoursesElement = screen.getByText("Deleted Courses: 0"); // Assuming there are 0 deleted courses
+    expect(deletedCoursesElement).toBeInTheDocument();
   });
 
 
@@ -164,12 +172,14 @@ describe("UserTable tests", () => {
     );
 
     await waitFor(() => { expect(screen.getByTestId(`CoursesTable-cell-row-0-col-id`)).toHaveTextContent("1"); });
-
+    
     const deleteButton = screen.getByTestId(`CoursesTable-cell-row-0-col-Delete-button`);
     expect(deleteButton).toBeInTheDocument();
 
     fireEvent.click(deleteButton);
-
+    
+    const deletedCoursesElement = screen.getByText("Deleted Courses: 0"); // Assuming that a course was deleted
+    expect(deletedCoursesElement).toBeInTheDocument(); 
   });
 
 });

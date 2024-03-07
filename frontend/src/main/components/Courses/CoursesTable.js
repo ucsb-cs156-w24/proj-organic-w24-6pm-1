@@ -5,6 +5,8 @@ import React from "react";
  import { useNavigate } from "react-router-dom";
  import { hasRole } from "main/utils/currentUser";
 
+ let deletedcourses = 0;
+
  export default function CoursesTable({ courses, currentUser }) {
 
      const navigate = useNavigate();
@@ -23,7 +25,7 @@ import React from "react";
      // Stryker restore all 
 
      // Stryker disable next-line all : TODO try to make a good test for this
-     const deleteCallback = async (cell) => { deleteMutation.mutate(cell); }
+     const deleteCallback = async (cell) => { deleteMutation.mutate(cell); deletedcourses++; }
 
      const columns = [
          {
@@ -61,8 +63,10 @@ import React from "react";
          columns.push(ButtonColumn("Delete", "danger", deleteCallback, "CoursesTable"));
      }
 
-     return <OurTable
-         data={courses}
-         columns={columns}
-         testid={"CoursesTable"} />;
+     return (
+        <>
+            <div>Deleted Courses: {deletedcourses}</div>
+          <OurTable data={courses} columns={columns} testid={"CoursesTable"} />
+        </>
+      );
     };
