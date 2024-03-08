@@ -20,7 +20,7 @@ import React from "react";
          { onSuccess: onDeleteSuccess },
          ["/api/courses/all"]
      );
-     // Stryker restore all 
+     //Stryker restore all 
 
      // Stryker disable next-line all : TODO try to make a good test for this
      const deleteCallback = async (cell) => { deleteMutation.mutate(cell); }
