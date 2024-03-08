@@ -55,8 +55,6 @@ public class SchoolController extends ApiController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private StaffRepository courseStaffRepository;
 
     @Operation(summary= "List all schools")
     @PreAuthorize("hasRole('ROLE_USER')")
