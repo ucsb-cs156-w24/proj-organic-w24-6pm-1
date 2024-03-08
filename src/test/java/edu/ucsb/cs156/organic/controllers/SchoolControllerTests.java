@@ -154,7 +154,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +188,7 @@ import lombok.extern.slf4j.Slf4j;
 @WebMvcTest(controllers = SchoolController.class)
 @Import(JobService.class)
 @AutoConfigureDataJpa
-public class SchoolControllerTests {
+public class SchoolControllerTests extends ControllerTestCase{
 
     @MockBean
     UserRepository userRepository;
@@ -206,6 +205,10 @@ public class SchoolControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    MockMvc mockMvc;
+
+
     @Test
     public void logged_out_users_cannot_get_all() throws Exception {
         mockMvc.perform(get("/api/schools/all")).andExpect(status().is(403));
@@ -214,24 +217,30 @@ public class SchoolControllerTests {
     @WithMockUser(roles = { "USER" })
     @Test
     public void logged_in_users_can_get_all() throws Exception {
-        mockMvc.perform(get("/api/schools/all")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/schools/all")).andExpect(status().is(200));
     }
 
     @Test
     public void logged_out_users_cannot_get_by_id() throws Exception {
-        mockMvc.perform(get("/api/schools").param("id", "1L")).andExpect(status().is(403));
+        mockMvc.perform(get("/api/schools").param("abbrev", "1L")).andExpect(status().is(403));
     }
 
     @WithMockUser(roles = { "USER" })
     @Test
     public void test_that_logged_in_user_can_get_by_id_when_the_id_exists() throws Exception {
-        School school = School.builder().abbrev("1L").name("Test School").build();
-        when(schoolRepository.findById(eq("1L"))).thenReturn(Optional.of(school));
+        School school = School.builder()
+                    .abbrev("ucsb")
+                    .name("Ubarbara")
+                    .termRegex("W24")
+                    .termDescription("F24")
+                    .termError("error")
+                    .build();
+        when(schoolRepository.findById(eq("ucsb"))).thenReturn(Optional.of(school));
 
-        MvcResult response = mockMvc.perform(get("/api/schools").param("id", "1L")).andExpect(status().isOk())
+        MvcResult response = mockMvc.perform(get("/api/schools").param("abbrev", "ucsb")).andExpect(status().isOk())
                 .andReturn();
 
-        verify(schoolRepository, times(1)).findById(eq("1L"));
+        verify(schoolRepository, times(1)).findById(eq("ucsb"));
         String expectedJson = objectMapper.writeValueAsString(school);
         String responseString = response.getResponse().getContentAsString();
         assertEquals(expectedJson, responseString);
@@ -240,22 +249,35 @@ public class SchoolControllerTests {
     @WithMockUser(roles = { "USER" })
     @Test
     public void test_that_logged_in_user_can_get_by_id_when_the_id_does_not_exist() throws Exception {
-        when(schoolRepository.findById(eq("2L"))).thenReturn(Optional.empty());
+        when(schoolRepository.findById(eq("umn"))).thenReturn(Optional.empty());
 
-        MvcResult response = mockMvc.perform(get("/api/schools").param("id", "2L")).andExpect(status().isNotFound())
+        MvcResult response = mockMvc.perform(get("/api/schools").param("abbrev", "umn")).andExpect(status().isNotFound())
                 .andReturn();
 
-        verify(schoolRepository, times(1)).findById(eq("2L"));
+        verify(schoolRepository, times(1)).findById(eq("umn"));
         Map<String, Object> json = objectMapper.readValue(response.getResponse().getContentAsString(), new TypeReference<Map<String, Object>>() {});
         assertEquals("EntityNotFoundException", json.get("type"));
-        assertEquals("School with id 2L not found", json.get("message"));
+        assertEquals("School with id umn not found", json.get("message"));
     }
 
     @WithMockUser(roles = { "USER" })
     @Test
     public void logged_in_user_can_get_all_schools() throws Exception {
-        School school1 = School.builder().abbrev("1L").name("School 1").build();
-        School school2 = School.builder().abbrev("2L").name("School 2").build();
+        School school1 = School.builder()
+                    .abbrev("ucsb")
+                    .name("Ubarbara")
+                    .termRegex("W24")
+                    .termDescription("F24")
+                    .termError("error")
+                    .build();        
+        School school2 = School.builder()
+                    .abbrev("umn")
+                    .name("mich")
+                    .termRegex("W24")
+                    .termDescription("M24")
+                    .termError("error1")
+                    .build();  
+        
         List<School> expectedSchools = Arrays.asList(school1, school2);
 
         when(schoolRepository.findAll()).thenReturn(expectedSchools);
