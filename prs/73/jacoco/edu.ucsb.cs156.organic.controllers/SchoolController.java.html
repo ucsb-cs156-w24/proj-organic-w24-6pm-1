@@ -61,7 +61,7 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
 
     @Operation(summary= &quot;Get a single school by abbreviation&quot;)
     @PreAuthorize(&quot;hasRole('ROLE_USER')&quot;)
-    @GetMapping(&quot;&quot;)
+    @GetMapping(&quot;/get&quot;)
     public School getById(
         @Parameter(name=&quot;abbrev&quot;) @RequestParam String abbrev) {
 <span class="fc" id="L67">        Optional&lt;School&gt; schoolOptional = schoolRepository.findById(abbrev);</span>
