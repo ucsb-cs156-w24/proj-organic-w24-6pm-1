@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.Operation;
 
-import java.time.Instant;
+import java.sql.Timestamp; //importing this because we dont need instant we need the timestamp 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -46,28 +46,27 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
   @Operation(summary = &quot;Update user's last online time&quot;)
   @PreAuthorize(&quot;hasRole('ROLE_USER')&quot;)
   @PostMapping(&quot;/last-online&quot;)
-  public ResponseEntity&lt;Instant&gt; updateLastOnline() {
+  public ResponseEntity&lt;Timestamp&gt; updateLastOnline() {
 <span class="fc" id="L50">    User user = super.getCurrentUser().getUser();</span>
-<span class="fc" id="L51">    Instant timeNow = Instant.now();</span>
+<span class="fc" id="L51">    Timestamp timeNow = new Timestamp(System.currentTimeMillis());</span>
 <span class="fc" id="L52">    user.setLastOnline(timeNow);</span>
 <span class="fc" id="L53">    userRepository.save(user);</span>
-<span class="fc" id="L54">    return ResponseEntity.ok().body(timeNow);</span>
-  }
+<span class="fc" id="L54">    return ResponseEntity.ok().body(timeNow);}</span>
 
   @Operation(summary = &quot;Get current users emails&quot;)
   @PreAuthorize(&quot;hasRole('ROLE_USER')&quot;)
   @GetMapping(&quot;/emails&quot;)
   public Iterable&lt;UserEmail&gt; getUsersEmails() {
-<span class="fc" id="L61">    User user = super.getCurrentUser().getUser();</span>
-<span class="fc" id="L62">    return user.getEmails();</span>
+<span class="fc" id="L60">    User user = super.getCurrentUser().getUser();</span>
+<span class="fc" id="L61">    return user.getEmails();</span>
   }
 
   @Operation(summary = &quot;Get courses for which current user is on the staff&quot;)
   @PreAuthorize(&quot;hasRole('ROLE_USER')&quot;)
   @GetMapping(&quot;/staffedCourses&quot;)
   public Iterable&lt;Course&gt; getStaffedCourses() {
-<span class="fc" id="L69">    User user = super.getCurrentUser().getUser();</span>
-<span class="fc" id="L70">    return userRepository.findCoursesStaffedByUser(user.getGithubId());  </span>
+<span class="fc" id="L68">    User user = super.getCurrentUser().getUser();</span>
+<span class="fc" id="L69">    return userRepository.findCoursesStaffedByUser(user.getGithubId());  </span>
   }
 
 }
