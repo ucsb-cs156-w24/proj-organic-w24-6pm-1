@@ -56,7 +56,7 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
     public School postSchool(
         @Parameter(name=&quot;abbrev&quot;, description=&quot;university domain name&quot;, example=&quot;ucsb&quot;) @RequestParam String abbrev,
         @Parameter(name=&quot;name&quot;, description=&quot;University name&quot;) @RequestParam String name,
-        @Parameter(name=&quot;termRegex&quot;, description=&quot;Format: [WSMF]\\d\\d&quot;) @RequestParam String termRegex,
+        @Parameter(name=&quot;termRegex&quot;, description=&quot;Format: Example [WSMF]\\d\\d&quot;) @RequestParam String termRegex,
         @Parameter(name=&quot;termDescription&quot;, description=&quot;Enter quarter, e.g. F23, W24, S24, M24&quot;) @RequestParam String termDescription,
         @Parameter(name=&quot;termError&quot;, description=&quot;input error?&quot;) @RequestParam String termError)
         {
@@ -68,8 +68,8 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
 <span class="fc" id="L68">        school.setTermDescription(termDescription);</span>
 <span class="fc" id="L69">        school.setTermError(termError);</span>
 
-<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (!termRegex.matches(&quot;[WSMF]\\d\\d&quot;)) {</span>
-<span class="fc" id="L72">            throw new IllegalArgumentException(&quot;Invalid termRegex format. It must follow the pattern [WSMF]\\d\\d&quot;);</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (!termDescription.matches(school.getTermRegex())) {</span>
+<span class="fc" id="L72">            throw new IllegalArgumentException(&quot;Invalid termDescription format. It must follow the pattern &quot; + school.getTermRegex());</span>
         }
 
 <span class="fc bfc" id="L75" title="All 2 branches covered.">        if (!abbrev.equals(abbrev.toLowerCase())){</span>
