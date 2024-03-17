@@ -74,6 +74,20 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
 <span class="fc" id="L74">        return school;</span>
     }
 
+
+    @Operation(summary= &quot;Delete a school&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+    @DeleteMapping(&quot;&quot;)
+    public Object deleteSchool(
+            @Parameter(name=&quot;abbrev&quot;) @RequestParam String abbrev) {
+<span class="fc" id="L83">                School school = schoolRepository.findById(abbrev)</span>
+<span class="fc" id="L84">                .orElseThrow(() -&gt; new EntityNotFoundException(School.class, abbrev));</span>
+
+<span class="fc" id="L86">        schoolRepository.delete(school);</span>
+<span class="fc" id="L87">        return genericMessage(&quot;School with id %s deleted&quot;.formatted(abbrev));</span>
+    }
+
+
     @Operation(summary= &quot;Create a new school&quot;)
     @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
     @PostMapping(&quot;/post&quot;)
@@ -85,24 +99,24 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
         @Parameter(name=&quot;termError&quot;, description=&quot;input error?&quot;) @RequestParam String termError)
         {
 
-<span class="fc" id="L88">        School school = School.builder().build();</span>
-<span class="fc" id="L89">        school.setAbbrev(abbrev);</span>
-<span class="fc" id="L90">        school.setName(name);</span>
-<span class="fc" id="L91">        school.setTermRegex(termRegex);</span>
-<span class="fc" id="L92">        school.setTermDescription(termDescription);</span>
-<span class="fc" id="L93">        school.setTermError(termError);</span>
+<span class="fc" id="L102">        School school = School.builder().build();</span>
+<span class="fc" id="L103">        school.setAbbrev(abbrev);</span>
+<span class="fc" id="L104">        school.setName(name);</span>
+<span class="fc" id="L105">        school.setTermRegex(termRegex);</span>
+<span class="fc" id="L106">        school.setTermDescription(termDescription);</span>
+<span class="fc" id="L107">        school.setTermError(termError);</span>
 
-<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (!termDescription.matches(school.getTermRegex())) {</span>
-<span class="fc" id="L96">            throw new IllegalArgumentException(&quot;Invalid termDescription format. It must follow the pattern &quot; + school.getTermRegex());</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (!termDescription.matches(school.getTermRegex())) {</span>
+<span class="fc" id="L110">            throw new IllegalArgumentException(&quot;Invalid termDescription format. It must follow the pattern &quot; + school.getTermRegex());</span>
         }
 
-<span class="fc bfc" id="L99" title="All 2 branches covered.">        if (!abbrev.equals(abbrev.toLowerCase())){</span>
-<span class="fc" id="L100">            throw new IllegalArgumentException(&quot;Invalid abbrev format. Abbrev must be all lowercase&quot;);</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (!abbrev.equals(abbrev.toLowerCase())){</span>
+<span class="fc" id="L114">            throw new IllegalArgumentException(&quot;Invalid abbrev format. Abbrev must be all lowercase&quot;);</span>
         }
 
-<span class="fc" id="L103">        School savedSchool = schoolRepository.save(school);</span>
+<span class="fc" id="L117">        School savedSchool = schoolRepository.save(school);</span>
 
-<span class="fc" id="L105">        return savedSchool;</span>
+<span class="fc" id="L119">        return savedSchool;</span>
     }
 
 
