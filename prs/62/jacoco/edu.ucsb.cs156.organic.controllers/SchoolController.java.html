@@ -60,7 +60,7 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
             @RequestBody @Valid School incoming) {
 
 <span class="fc" id="L62">                School school = schoolRepository.findById(abbrev)</span>
-<span class="pc" id="L63">                .orElseThrow(() -&gt; new EntityNotFoundException(School.class, abbrev));</span>
+<span class="fc" id="L63">                .orElseThrow(() -&gt; new EntityNotFoundException(School.class, abbrev));</span>
 
 <span class="fc" id="L65">        school.setName(incoming.getName());</span>
 <span class="fc" id="L66">        school.setTermRegex(incoming.getTermRegex());</span>
