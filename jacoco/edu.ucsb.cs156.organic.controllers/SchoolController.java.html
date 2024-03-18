@@ -50,22 +50,66 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
     @Autowired
     UserRepository userRepository;
 
+    @Operation(summary = &quot;Update information for a school&quot;)
+    // allow for roles of ADMIN or INSTRUCTOR but only if the user is a staff member
+    // for the course
+    @PreAuthorize(&quot;hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')&quot;)
+    @PutMapping(&quot;/update&quot;)
+    public School updateSchool(
+            @Parameter(name = &quot;abbrev&quot;) @RequestParam String abbrev,
+            @RequestBody @Valid School incoming) {
+
+<span class="fc" id="L62">                School school = schoolRepository.findById(abbrev)</span>
+<span class="fc" id="L63">                .orElseThrow(() -&gt; new EntityNotFoundException(School.class, abbrev));</span>
+
+<span class="fc" id="L65">        school.setName(incoming.getName());</span>
+<span class="fc" id="L66">        school.setTermRegex(incoming.getTermRegex());</span>
+<span class="fc" id="L67">        school.setTermDescription(incoming.getTermDescription());</span>
+<span class="fc" id="L68">        school.setTermError(incoming.getTermError());</span>
+
+<span class="fc" id="L70">        schoolRepository.save(school);</span>
+
+<span class="fc" id="L72">        log.info(&quot;school={}&quot;, school);</span>
+
+<span class="fc" id="L74">        return school;</span>
+    }
+
+
+    @Operation(summary= &quot;List all schools&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_USER')&quot;)
+    @GetMapping(&quot;/all&quot;)
+    public Iterable&lt;School&gt; allSchools() {
+<span class="fc" id="L82">        Iterable&lt;School&gt; schools = schoolRepository.findAll();</span>
+<span class="fc" id="L83">        return schools;</span>
+    }
+
+    @Operation(summary= &quot;Get a single school by abbreviation&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_USER')&quot;)
+    @GetMapping(&quot;&quot;)
+
+    public School getById(
+        @Parameter(name=&quot;abbrev&quot;) @RequestParam String abbrev) {
+<span class="fc" id="L92">        Optional&lt;School&gt; schoolOptional = schoolRepository.findById(abbrev);</span>
+<span class="fc" id="L93">        School school = schoolOptional.orElseThrow(() -&gt; new EntityNotFoundException(School.class, abbrev));</span>
+<span class="fc" id="L94">        return school;</span>
+    }
 
     @Operation(summary= &quot;Delete a school&quot;)
     @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
     @DeleteMapping(&quot;&quot;)
     public Object deleteSchool(
             @Parameter(name=&quot;abbrev&quot;) @RequestParam String abbrev) {
-<span class="fc" id="L59">                School school = schoolRepository.findById(abbrev)</span>
-<span class="fc" id="L60">                .orElseThrow(() -&gt; new EntityNotFoundException(School.class, abbrev));</span>
+<span class="fc" id="L102">                School school = schoolRepository.findById(abbrev)</span>
+<span class="fc" id="L103">                .orElseThrow(() -&gt; new EntityNotFoundException(School.class, abbrev));</span>
 
-<span class="fc" id="L62">        schoolRepository.delete(school);</span>
-<span class="fc" id="L63">        return genericMessage(&quot;School with id %s deleted&quot;.formatted(abbrev));</span>
+<span class="fc" id="L105">        schoolRepository.delete(school);</span>
+<span class="fc" id="L106">        return genericMessage(&quot;School with id %s deleted&quot;.formatted(abbrev));</span>
     }
 
 
     @Operation(summary= &quot;Create a new school&quot;)
-    @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+
+  @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
     @PostMapping(&quot;/post&quot;)
     public School postSchool(
         @Parameter(name=&quot;abbrev&quot;, description=&quot;university domain name&quot;, example=&quot;ucsb&quot;) @RequestParam String abbrev,
@@ -75,24 +119,24 @@ import edu.ucsb.cs156.organic.repositories.UserRepository;
         @Parameter(name=&quot;termError&quot;, description=&quot;input error?&quot;) @RequestParam String termError)
         {
 
-<span class="fc" id="L78">        School school = School.builder().build();</span>
-<span class="fc" id="L79">        school.setAbbrev(abbrev);</span>
-<span class="fc" id="L80">        school.setName(name);</span>
-<span class="fc" id="L81">        school.setTermRegex(termRegex);</span>
-<span class="fc" id="L82">        school.setTermDescription(termDescription);</span>
-<span class="fc" id="L83">        school.setTermError(termError);</span>
+<span class="fc" id="L122">        School school = School.builder().build();</span>
+<span class="fc" id="L123">        school.setAbbrev(abbrev);</span>
+<span class="fc" id="L124">        school.setName(name);</span>
+<span class="fc" id="L125">        school.setTermRegex(termRegex);</span>
+<span class="fc" id="L126">        school.setTermDescription(termDescription);</span>
+<span class="fc" id="L127">        school.setTermError(termError);</span>
 
-<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (!termDescription.matches(school.getTermRegex())) {</span>
-<span class="fc" id="L86">            throw new IllegalArgumentException(&quot;Invalid termDescription format. It must follow the pattern &quot; + school.getTermRegex());</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">        if (!termDescription.matches(school.getTermRegex())) {</span>
+<span class="fc" id="L130">            throw new IllegalArgumentException(&quot;Invalid termDescription format. It must follow the pattern &quot; + school.getTermRegex());</span>
         }
 
-<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (!abbrev.equals(abbrev.toLowerCase())){</span>
-<span class="fc" id="L90">            throw new IllegalArgumentException(&quot;Invalid abbrev format. Abbrev must be all lowercase&quot;);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if (!abbrev.equals(abbrev.toLowerCase())){</span>
+<span class="fc" id="L134">            throw new IllegalArgumentException(&quot;Invalid abbrev format. Abbrev must be all lowercase&quot;);</span>
         }
 
-<span class="fc" id="L93">        School savedSchool = schoolRepository.save(school);</span>
+<span class="fc" id="L137">        School savedSchool = schoolRepository.save(school);</span>
 
-<span class="fc" id="L95">        return savedSchool;</span>
+<span class="fc" id="L139">        return savedSchool;</span>
     }
 
 
